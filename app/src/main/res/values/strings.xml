@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Practical Test 02</string>
+    <string name="server">SERVER</string>
+    <string name="server_port">Port</string>
+    <string name="connect">Connect</string>
+    <string name="client">CLIENT</string>
+    <string name="client_address">Address</string>
+    <string name="client_port">Port</string>
+    <string name="hour">Hour</string>
+    <string name="minute">Minute</string>
+    <string name="information_type">Information Type</string>
+    <string name="set_alarm">set alarm</string>
+    <string name="reset_alarm">reset alarm</string>
+    <string name="poll_alarm">poll alarm</string>
+</resources>
