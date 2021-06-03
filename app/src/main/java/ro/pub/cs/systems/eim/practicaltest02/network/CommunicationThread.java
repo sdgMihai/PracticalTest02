@@ -39,6 +39,7 @@ public class CommunicationThread extends Thread {
 
     private ServerThread serverThread;
     private Socket socket;
+    private String timer = "timer";
 
     public CommunicationThread(ServerThread serverThread, Socket socket) {
         this.serverThread = serverThread;
@@ -58,130 +59,27 @@ public class CommunicationThread extends Thread {
                 Log.e(Constants.TAG, "[COMMUNICATION THREAD] Buffered Reader / Print Writer are null!");
                 return;
             }
-            Log.i(Constants.TAG, "[COMMUNICATION THREAD] Waiting for parameters from client (city / information type!");
-            String city = bufferedReader.readLine();
-            String informationType = bufferedReader.readLine();
-            if (city == null || city.isEmpty() || informationType == null || informationType.isEmpty()) {
-                Log.e(Constants.TAG, "[COMMUNICATION THREAD] Error receiving parameters from client (city / information type!");
+            Log.i(Constants.TAG, "[COMMUNICATION THREAD] Waiting for parameters from client (hour / minute!");
+            String hour = bufferedReader.readLine();
+            String minute = bufferedReader.readLine();
+            String type = bufferedReader.readLine();
+            if (hour == null || hour.isEmpty() || minute == null || minute.isEmpty() || type == null || type.isEmpty()) {
+                Log.e(Constants.TAG, "[COMMUNICATION THREAD] Error receiving parameters from client (hour / minute / type!");
                 return;
             }
             HashMap<String, TimerInformation> data = serverThread.getData();
             TimerInformation timerInformation = null;
-            if (data.containsKey(city)) {
+            if (data.containsKey(timer)) {
                 Log.i(Constants.TAG, "[COMMUNICATION THREAD] Getting the information from the cache...");
-                timerInformation = data.get(city);
+                timerInformation = data.get(timer);
             } else {
                 Log.i(Constants.TAG, "[COMMUNICATION THREAD] Getting the information from the webservice...");
                 HttpClient httpClient = new DefaultHttpClient();
                 String pageSourceCode = "";
-                if(false) {
-                    HttpPost httpPost = new HttpPost(Constants.WEB_SERVICE_ADDRESS);
-                    List<NameValuePair> params = new ArrayList<>();
-                    params.add(new BasicNameValuePair("q", city));
-                    params.add(new BasicNameValuePair("mode", Constants.WEB_SERVICE_MODE));
-                    params.add(new BasicNameValuePair("APPID", Constants.WEB_SERVICE_API_KEY));
-                    UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(params, HTTP.UTF_8);
-                    httpPost.setEntity(urlEncodedFormEntity);
-                    ResponseHandler<String> responseHandler = new BasicResponseHandler();
-
-                    pageSourceCode = httpClient.execute(httpPost, responseHandler);
-                } else {
-                    HttpGet httpGet = new HttpGet(Constants.WEB_SERVICE_ADDRESS + "?q=" + city + "&APPID=" + Constants.WEB_SERVICE_API_KEY + "&units=" + Constants.UNITS);
-                    HttpResponse httpGetResponse = httpClient.execute(httpGet);
-                    HttpEntity httpGetEntity = httpGetResponse.getEntity();
-                    if (httpGetEntity != null) {
-                        pageSourceCode = EntityUtils.toString(httpGetEntity);
-
-                    }
-                }
-
-                if (pageSourceCode == null) {
-                    Log.e(Constants.TAG, "[COMMUNICATION THREAD] Error getting the information from the webservice!");
-                    return;
-                } else
-                    Log.i(Constants.TAG, pageSourceCode );
-
-                // Updated for openweather API
-                if (false) {
-                    Document document = Jsoup.parse(pageSourceCode);
-                    Element element = document.child(0);
-                    Elements elements = element.getElementsByTag(Constants.SCRIPT_TAG);
-                    for (Element script : elements) {
-                        String scriptData = script.data();
-                        if (scriptData.contains(Constants.SEARCH_KEY)) {
-                            int position = scriptData.indexOf(Constants.SEARCH_KEY) + Constants.SEARCH_KEY.length();
-                            scriptData = scriptData.substring(position);
-                            JSONObject content = new JSONObject(scriptData);
-                            JSONObject currentObservation = content.getJSONObject(Constants.CURRENT_OBSERVATION);
-                            String temperature = currentObservation.getString(Constants.TEMPERATURE);
-                            String windSpeed = currentObservation.getString(Constants.WIND_SPEED);
-                            String condition = currentObservation.getString(Constants.CONDITION);
-                            String pressure = currentObservation.getString(Constants.PRESSURE);
-                            String humidity = currentObservation.getString(Constants.HUMIDITY);
-                            // todo
-//                            pokemonInformation = new PokemonInformation(
-//                                    temperature, windSpeed, condition, pressure, humidity
-//                            );
-//                            serverThread.setData(city, pokemonInformation);
-                            break;
-                        }
-                    }
-                } else {
-                    JSONObject content = new JSONObject(pageSourceCode);
-
-                    JSONArray weatherArray = content.getJSONArray(Constants.WEATHER);
-                    JSONObject weather;
-                    String condition = "";
-                    for (int i = 0; i < weatherArray.length(); i++) {
-                        weather = weatherArray.getJSONObject(i);
-                        condition += weather.getString(Constants.MAIN) + " : " + weather.getString(Constants.DESCRIPTION);
-
-                        if (i < weatherArray.length() - 1) {
-                            condition += ";";
-                        }
-                    }
-
-                    JSONObject main = content.getJSONObject(Constants.MAIN);
-                    String temperature = main.getString(Constants.TEMP);
-                    String pressure = main.getString(Constants.PRESSURE);
-                    String humidity = main.getString(Constants.HUMIDITY);
-
-                    JSONObject wind = content.getJSONObject(Constants.WIND);
-                    String windSpeed = wind.getString(Constants.SPEED);
-
-//                    pokemonInformation = new WeatherForecastInformation(
-//                            temperature, windSpeed, condition, pressure, humidity
-//                    );
-                    serverThread.setData(city, timerInformation);
-                }
             }
-            if (timerInformation == null) {
-                Log.e(Constants.TAG, "[COMMUNICATION THREAD] Weather Forecast Information is null!");
-                return;
-            }
+
             String result = null;
-//            switch(informationType) {
-//                case Constants.ALL:
-//                    result = pokemonInformation.toString();
-//                    break;
-//                case Constants.TEMPERATURE:
-//                    result = pokemonInformation.getTemperature();
-//                    break;
-//                case Constants.WIND_SPEED:
-//                    result = pokemonInformation.getWindSpeed();
-//                    break;
-//                case Constants.CONDITION:
-//                    result = pokemonInformation.getCondition();
-//                    break;
-//                case Constants.HUMIDITY:
-//                    result = pokemonInformation.getHumidity();
-//                    break;
-//                case Constants.PRESSURE:
-//                    result = pokemonInformation.getPressure();
-//                    break;
-//                default:
-//                    result = "[COMMUNICATION THREAD] Wrong information type (all / temperature / wind_speed / condition / humidity / pressure)!";
-//            }
+            result = "[COMMUNICATION THREAD] test information type " + type;
             printWriter.println(result);
             printWriter.flush();
         } catch (IOException ioException) {
@@ -189,12 +87,13 @@ public class CommunicationThread extends Thread {
             if (Constants.DEBUG) {
                 ioException.printStackTrace();
             }
-        } catch (JSONException jsonException) {
-            Log.e(Constants.TAG, "[COMMUNICATION THREAD] An exception has occurred: " + jsonException.getMessage());
-            if (Constants.DEBUG) {
-                jsonException.printStackTrace();
-            }
-        } finally {
+        } // catch (JSONException jsonException) {
+//            Log.e(Constants.TAG, "[COMMUNICATION THREAD] An exception has occurred: " + jsonException.getMessage());
+//            if (Constants.DEBUG) {
+//                jsonException.printStackTrace();
+//            }
+//        }
+        finally {
             if (socket != null) {
                 try {
                     socket.close();

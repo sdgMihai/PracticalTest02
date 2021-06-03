@@ -15,18 +15,20 @@ public class ClientThread extends Thread {
 
     private String address;
     private int port;
-    private String timerName;
-    private String informationType;
-    private TextView pokemonTextView;
+    private String hour;
+    private String minute;
+    private int type = -1; // 0 - set, 1 -reset, 2-poll
+    private TextView timerTextView;
 
     private Socket socket;
 
-    public ClientThread(String address, int port, String timerName, String informationType, TextView pokemonTextView) {
+    public ClientThread(String address, int port, String hour, String minute, int type, TextView timerTextView) {
         this.address = address;
         this.port = port;
-        this.timerName = timerName;
-        this.informationType = informationType;
-        this.pokemonTextView = pokemonTextView;
+        this.hour = hour;
+        this.minute = minute;
+        this.timerTextView = timerTextView;
+        this.type = type;
     }
 
     @Override
@@ -43,17 +45,19 @@ public class ClientThread extends Thread {
                 Log.e(Constants.TAG, "[CLIENT THREAD] Buffered Reader / Print Writer are null!");
                 return;
             }
-            printWriter.println(timerName);
+            printWriter.println(hour);
             printWriter.flush();
-            printWriter.println(informationType);
+            printWriter.println(minute);
             printWriter.flush();
-            String weatherInformation;
-            while ((weatherInformation = bufferedReader.readLine()) != null) {
-                final String finalizedWeateherInformation = weatherInformation;
-                pokemonTextView.post(new Runnable() {
+            printWriter.println(type);
+            printWriter.flush();
+            String timerInformation;
+            while ((timerInformation = bufferedReader.readLine()) != null) {
+                final String finalizedTimerInformation = timerInformation;
+                timerTextView.post(new Runnable() {
                    @Override
                     public void run() {
-                       pokemonTextView.setText(finalizedWeateherInformation);
+                       timerTextView.setText(finalizedTimerInformation);
                    }
                 });
             }

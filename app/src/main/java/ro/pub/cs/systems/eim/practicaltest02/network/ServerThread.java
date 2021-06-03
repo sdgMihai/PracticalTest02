@@ -48,8 +48,8 @@ public class ServerThread extends Thread {
         return serverSocket;
     }
 
-    public synchronized void setData(String city, TimerInformation TimerInformation) {
-        this.data.put(city, TimerInformation);
+    public synchronized void setData(String timer, TimerInformation TimerInformation) {
+        this.data.put(timer, TimerInformation);
     }
 
     public synchronized HashMap<String, TimerInformation> getData() {
