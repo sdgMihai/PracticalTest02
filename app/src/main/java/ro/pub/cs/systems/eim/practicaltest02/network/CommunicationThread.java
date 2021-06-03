@@ -68,14 +68,49 @@ public class CommunicationThread extends Thread {
                 return;
             }
             HashMap<String, TimerInformation> data = serverThread.getData();
-            TimerInformation timerInformation = null;
+            TimerInformation timerInformation = new TimerInformation("0", "0");
             if (data.containsKey(timer)) {
                 Log.i(Constants.TAG, "[COMMUNICATION THREAD] Getting the information from the cache...");
                 timerInformation = data.get(timer);
             } else {
                 Log.i(Constants.TAG, "[COMMUNICATION THREAD] Getting the information from the webservice...");
-                HttpClient httpClient = new DefaultHttpClient();
-                String pageSourceCode = "";
+//                Socket tsocket = new Socket("128.138.140.44", 13);
+//                try{
+//                    String pageSourceCode = "";
+//                    if (tsocket == null) {
+//                        Log.e(Constants.TAG, "[comm THREAD] edu Could not create socket!");
+//                        return;
+//                    }
+//                    BufferedReader bufferedReaderEdu = Utilities.getReader(socket);
+//                    PrintWriter printWriterEdu = Utilities.getWriter(socket);
+//                    if (bufferedReader == null || printWriter == null) {
+//                        Log.e(Constants.TAG, "[CLIENT THREAD] Buffered Reader / Print Writer are null!");
+//                        return;
+//                    }
+//                    printWriterEdu.println(hour);
+//                    printWriterEdu.flush();
+//                    printWriterEdu.println(minute);
+//                    printWriterEdu.flush();
+//                } catch (IOException ioException) {
+//                    Log.e(Constants.TAG, "[edui THREAD] An exception has occurred: " + ioException.getMessage());
+//                    if (Constants.DEBUG) {
+//                        ioException.printStackTrace();
+//                    }
+//                } finally {
+//                    if (tsocket != null) {
+//                        try {
+//                            socket.close();
+//                        } catch (IOException ioException) {
+//                            Log.e(Constants.TAG, "[edui THREAD] An exception has occurred: " + ioException.getMessage());
+//                            if (Constants.DEBUG) {
+//                                ioException.printStackTrace();
+//                            }
+//                        }
+//                    }
+//                }
+                timerInformation.setHour(hour);
+                timerInformation.setMinute(minute);
+                serverThread.setData(timer, timerInformation);
             }
 
             String result = null;
